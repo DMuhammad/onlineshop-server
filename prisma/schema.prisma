@@ -60,6 +60,8 @@ model User {
   Cart      Cart[]
   Order     Order[]
   Review    Review[]
+
+  @@map("users")
 }
 
 model Category {
@@ -68,6 +70,8 @@ model Category {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Product   Product[]
+
+  @@map("categories")
 }
 
 model Product {
@@ -79,6 +83,8 @@ model Product {
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   ProductVariant ProductVariant[]
+
+  @@map("products")
 }
 
 model ProductVariant {
@@ -94,6 +100,8 @@ model ProductVariant {
   updatedAt    DateTime    @updatedAt
   Cart         Cart[]
   OrderItem    OrderItem[]
+
+  @@map("product_variants")
 }
 
 model Cart {
@@ -105,6 +113,8 @@ model Cart {
   quantity         Int
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
+
+  @@map("carts")
 }
 
 model Discount {
@@ -115,6 +125,8 @@ model Discount {
   expiredDate DateTime
   createdAt   DateTime @default(now())
   Order       Order[]
+
+  @@map("discounts")
 }
 
 model Order {
@@ -132,6 +144,8 @@ model Order {
   Payment    Payment[]
   Shipment   Shipment[]
   Review     Review[]
+
+  @@map("orders")
 }
 
 model OrderItem {
@@ -144,6 +158,8 @@ model OrderItem {
   subtotal         Decimal
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
+
+  @@map("order_items")
 }
 
 model Payment {
@@ -154,6 +170,8 @@ model Payment {
   price         Decimal
   status        PaymentStatus
   paidAt        DateTime      @default(now())
+
+  @@map("payments")
 }
 
 model Shipment {
@@ -166,6 +184,8 @@ model Shipment {
   status           ShipmentStatus
   shippedAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
+
+  @@map("shipments")
 }
 
 model Review {
@@ -177,4 +197,6 @@ model Review {
   rating    Int
   comment   String   @db.VarChar(255)
   createdAt DateTime @default(now())
+
+  @@map("reviews")
 }
