@@ -54,7 +54,7 @@ model User {
   photoUrl  String?
   phone     String
   address   String   @db.VarChar(255)
-  role      Role
+  role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Cart      Cart[]
@@ -136,8 +136,8 @@ model Order {
   discount   Discount?   @relation(fields: [discountId], references: [id])
   discountId String?
   totalPrice Decimal
-  note       String      @db.VarChar(255)
-  status     OrderStatus
+  note       String?     @db.VarChar(255)
+  status     OrderStatus @default(PENDING)
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
   OrderItem  OrderItem[]
@@ -168,7 +168,7 @@ model Payment {
   orderId       String
   paymentMethod String
   price         Decimal
-  status        PaymentStatus
+  status        PaymentStatus @default(PENDING)
   paidAt        DateTime      @default(now())
 
   @@map("payments")
@@ -178,10 +178,10 @@ model Shipment {
   id               String         @id @default(uuid(7))
   order            Order          @relation(fields: [orderId], references: [id])
   orderId          String
-  trackingNumber   String
+  trackingNumber   String?
   courier          String
   estimateDelivery DateTime       @db.Date
-  status           ShipmentStatus
+  status           ShipmentStatus @default(PENDING)
   shippedAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 
@@ -195,7 +195,7 @@ model Review {
   order     Order    @relation(fields: [orderId], references: [id])
   orderId   String
   rating    Int
-  comment   String   @db.VarChar(255)
+  comment   String?  @db.VarChar(255)
   createdAt DateTime @default(now())
 
   @@map("reviews")
