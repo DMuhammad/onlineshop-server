@@ -1,0 +1,24 @@
+const Joi = require("joi");
+
+const addToCartSchema = Joi.object({
+  userId: Joi.string().guid({ version: "uuidv7" }).required(),
+  productVariantId: Joi.string().guid({ version: "uuidv7" }).required(),
+  quantity: Joi.number().integer().required(),
+});
+
+function validateAddToCart(data) {
+  const { error, value } = addToCartSchema.validate(data, {
+    abortEarly: false,
+  });
+
+  if (error) {
+    const messages = error.details.map((detail) => detail.message);
+    const err = new Error("Validation failed");
+    err.details = messages;
+    return err;
+  }
+
+  return value;
+}
+
+module.exports = { validateAddToCart };
