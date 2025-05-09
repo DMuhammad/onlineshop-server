@@ -52,8 +52,8 @@ model User {
   email     String   @unique
   password  String
   photoUrl  String?
-  phone     String
-  address   String   @db.VarChar(255)
+  phone     String?
+  address   String?  @db.VarChar(255)
   role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
