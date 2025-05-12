@@ -1,5 +1,6 @@
 const { validateSignIn, validateSignUp } = require("../dtos/auth.dto");
 const AuthService = require("../services/auth.service");
+const catchAsync = require("../utils/catchAsync");
 const {
   successResponse,
   errorResponse,
@@ -7,52 +8,74 @@ const {
 
 const authService = new AuthService();
 
-const signIn = async (req, res, next) => {
-  try {
-    const validated = validateSignIn(req.body);
-    const result = await authService.signIn(validated);
+const signIn = catchAsync(async (req, res) => {
+  const validated = validateSignIn(req.body);
+  const { error, result } = await authService.signIn(validated);
 
-    res.cookie("refresh_token", result.refreshToken, {
-      httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7day
-    });
-
-    return successResponse(res, "Login successfully", result, 200);
-  } catch (error) {
-    console.log(error);
-    return errorResponse(res, "error", error);
+  if (error) {
+    return errorResponse(res, result.message, result, result.code);
   }
-};
 
-const signUp = async (req, res, next) => {
-  try {
-    const validated = validateSignUp(req.body);
-    const result = await authService.signUp(validated);
+  res.cookie("refresh_token", result.refreshToken, {
+    httpOnly: true,
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7day
+  });
 
-    return successResponse(res, "User created successfully", result, 201);
-  } catch (error) {
-    console.log(error);
-    return errorResponse(res, "error", error);
+  return successResponse(res, "Login successfully", result, result.code);
+});
+
+const signUp = catchAsync(async (req, res) => {
+  const validated = validateSignUp(req.body);
+  const { error, result } = await authService.signUp(validated);
+
+  if (error) {
+    return errorResponse(res, result.message, result, result.code);
   }
-};
 
-const signOut = async (req, res, next) => {
-  try {
-    await authService.signOut(req.cookies);
+  return successResponse(res, "User created successfully", result, result.code);
+});
 
-    res.clearCookie("refresh_token", {
-      httpOnly: true,
-    });
+const signOut = catchAsync(async (req, res) => {
+  const { error, result } = await authService.signOut(req.cookies);
 
-    return successResponse(res, "Sign out successfully");
-  } catch (error) {
-    console.log(error);
-    return errorResponse(res, "error", error);
+  if (error) {
+    return errorResponse(res, result.message, result, result.code);
   }
-};
+
+  res.clearCookie("refresh_token", {
+    httpOnly: true,
+  });
+
+  return successResponse(res, "Sign out successfully");
+});
+
+const changePassword = catchAsync(async (req, res) => {
+  const { error, result } = await authService.changePassword(
+    req.body,
+    req.params
+  );
+
+  if (error) {
+    return errorResponse(res, result.message, result, result.code);
+  }
+
+  return successResponse(res, "Password updated successfully");
+});
+
+const refreshToken = catchAsync(async (req, res) => {
+  const { error, result } = await authService.refreshToken(req.cookies);
+
+  if (error) {
+    return errorResponse(res, result.message, result, result.code);
+  }
+
+  return successResponse(res, "Successfully get access token", result, 200);
+});
 
 module.exports = {
   signIn,
   signUp,
   signOut,
+  changePassword,
+  refreshToken,
 };

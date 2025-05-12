@@ -1,9 +1,7 @@
 const { PrismaClient } = require("../generated/prisma");
-const ApiError = require("../utils/ApiError");
 const prisma = new PrismaClient();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { successResponse } = require("../utils/responseFormatter");
 require("dotenv").config();
 
 class AuthService {
@@ -12,10 +10,25 @@ class AuthService {
       where: { email: email },
     });
 
-    if (!existingUser)
-      throw new ApiError(409, "Email not found. Please register first");
-    if (!bcrypt.compareSync(password, existingUser.password))
-      throw new ApiError(403, "Invalid password");
+    if (!existingUser) {
+      return {
+        error: true,
+        result: {
+          message: "Email not found. Please register first.",
+          code: 409,
+        },
+      };
+    }
+
+    if (!bcrypt.compareSync(password, existingUser.password)) {
+      return {
+        error: true,
+        result: {
+          message: "Invalid Password",
+          code: 403,
+        },
+      };
+    }
 
     const accessToken = jwt.sign(
       { id: existingUser.id, email },
@@ -29,10 +42,14 @@ class AuthService {
     );
 
     return {
-      id: existingUser.id,
-      fullName: existingUser.fullName,
-      accessToken,
-      refreshToken,
+      error: false,
+      result: {
+        id: existingUser.id,
+        fullName: existingUser.fullName,
+        accessToken,
+        refreshToken,
+        code: 200,
+      },
     };
   }
 
@@ -41,9 +58,24 @@ class AuthService {
       where: { email: email },
     });
 
-    if (existingUser) throw new ApiError(409, "Email already registered");
-    if (password !== confirmPassword)
-      throw new ApiError(409, "Confirm password not match");
+    if (existingUser) {
+      return {
+        error: true,
+        result: {
+          message: "Email already registered",
+          code: 409,
+        },
+      };
+    }
+    if (password !== confirmPassword) {
+      return {
+        error: true,
+        result: {
+          message: "Confirm password not match",
+          code: 409,
+        },
+      };
+    }
 
     const salt = bcrypt.genSaltSync();
 
@@ -55,15 +87,104 @@ class AuthService {
       },
     });
 
-    return user;
+    return {
+      error: false,
+      result: user,
+    };
   }
 
   async signOut({ refresh_token }) {
     if (!refresh_token) {
-      throw new ApiError(402, "Refresh token not found");
+      return {
+        error: true,
+        result: {
+          message: "Refresh token not found",
+          code: 402,
+        },
+      };
     }
 
-    return;
+    return {
+      error: false,
+      result: null,
+    };
+  }
+
+  async refreshToken({ refresh_token }) {
+    if (!refresh_token) {
+      return {
+        error: true,
+        result: {
+          message: "Refresh token not found",
+          code: 402,
+        },
+      };
+    }
+
+    const decoded = jwt.verify(refresh_token, process.env.REFRESH_TOKEN_SECRET);
+
+    const accessToken = jwt.sign(
+      { id: decoded.id },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    return {
+      error: false,
+      result: accessToken,
+    };
+  }
+
+  async changePassword({ oldPassword, newPassword, confirmPassword }, { id }) {
+    const existingUser = await prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!existingUser) {
+      return {
+        error: true,
+        result: {
+          message: "User not found",
+          code: 409,
+        },
+      };
+    }
+
+    if (!bcrypt.compareSync(oldPassword, existingUser.password)) {
+      return {
+        error: true,
+        result: {
+          message: "Invalid password",
+          code: 403,
+        },
+      };
+    }
+
+    if (newPassword != confirmPassword) {
+      return {
+        error: true,
+        result: {
+          message: "Confirm password not match",
+          code: 409,
+        },
+      };
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        password: bcrypt.hashSync(newPassword, bcrypt.genSaltSync()),
+      },
+    });
+
+    return {
+      error: false,
+      result: updatedUser,
+    };
   }
 }
 
