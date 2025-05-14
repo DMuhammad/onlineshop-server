@@ -13,8 +13,9 @@ const signInSchema = Joi.object({
 });
 
 const updatePasswordSchema = Joi.object({
-  password: Joi.string().min(8).required(),
-  confirmPassword: Joi.string().min(8).valid(Joi.ref("password")).required(),
+  oldPassword: Joi.string().min(8).required(),
+  newPassword: Joi.string().min(8).required(),
+  confirmPassword: Joi.string().min(8).valid(Joi.ref("newPassword")).required(),
 });
 
 function validateSignUp(data) {
