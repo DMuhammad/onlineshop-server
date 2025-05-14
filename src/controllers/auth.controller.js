@@ -1,4 +1,8 @@
-const { validateSignIn, validateSignUp } = require("../dtos/auth.dto");
+const {
+  validateSignIn,
+  validateSignUp,
+  validateUpdatePassword,
+} = require("../dtos/auth.dto");
 const AuthService = require("../services/auth.service");
 const catchAsync = require("../utils/catchAsync");
 const {
@@ -50,8 +54,9 @@ const signOut = catchAsync(async (req, res) => {
 });
 
 const changePassword = catchAsync(async (req, res) => {
+  const validated = validateUpdatePassword(req.body);
   const { error, result } = await authService.changePassword(
-    req.body,
+    validated,
     req.params
   );
 
