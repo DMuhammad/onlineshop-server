@@ -66,7 +66,7 @@ model User {
 
 model Category {
   id        String    @id @default(uuid(7))
-  name      String
+  name      String    @unique
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Product   Product[]
@@ -78,7 +78,7 @@ model Product {
   id             String           @id @default(uuid(7))
   category       Category         @relation(fields: [categoryId], references: [id])
   categoryId     String
-  name           String
+  name           String           @unique
   description    String           @db.VarChar(255)
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
@@ -119,7 +119,7 @@ model Cart {
 
 model Discount {
   id          String   @id @default(uuid(7))
-  code        String
+  code        String   @unique
   type        String
   value       Decimal
   expiredDate DateTime
@@ -178,7 +178,7 @@ model Shipment {
   id               String         @id @default(uuid(7))
   order            Order          @relation(fields: [orderId], references: [id])
   orderId          String
-  trackingNumber   String?
+  trackingNumber   String?        @unique
   courier          String
   estimateDelivery DateTime       @db.Date
   status           ShipmentStatus @default(PENDING)
