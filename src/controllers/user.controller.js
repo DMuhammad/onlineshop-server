@@ -1,3 +1,4 @@
+const { validateUpdateUser } = require("../dtos/user.dto");
 const UserService = require("../services/user.service");
 const catchAsync = require("../utils/catchAsync");
 const {
@@ -18,8 +19,9 @@ const getUserById = catchAsync(async (req, res) => {
 });
 
 const updateUser = catchAsync(async (req, res) => {
+  const validated = validateUpdateUser(req.body);
   const { error, result } = await userService.updateProfile(
-    req.body,
+    validated,
     req.params
   );
 
