@@ -120,9 +120,10 @@ model Cart {
 model Discount {
   id          String   @id @default(uuid(7))
   code        String   @unique
-  type        String
   value       Decimal
+  startDate   DateTime
   expiredDate DateTime
+  quota       Int
   createdAt   DateTime @default(now())
   Order       Order[]
 
