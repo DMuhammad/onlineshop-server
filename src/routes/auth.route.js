@@ -12,7 +12,7 @@ const authRoute = express.Router();
 
 authRoute.post("/sign-in", signIn);
 authRoute.post("/sign-up", signUp);
-authRoute.get("/sign-out", verifyAuth, signOut);
+authRoute.post("/sign-out", verifyAuth, signOut);
 authRoute.put("/{:id}/changePassword", verifyAuth, changePassword);
 authRoute.get("/refreshToken", verifyAuth, refreshToken);
 
