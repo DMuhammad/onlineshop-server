@@ -14,6 +14,6 @@ authRoute.post("/sign-in", signIn);
 authRoute.post("/sign-up", signUp);
 authRoute.post("/sign-out", verifyAuth, signOut);
 authRoute.put("/{:id}/changePassword", verifyAuth, changePassword);
-authRoute.get("/refreshToken", verifyAuth, refreshToken);
+authRoute.get("/refreshToken", refreshToken);
 
 module.exports = authRoute;
