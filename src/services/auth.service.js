@@ -85,6 +85,9 @@ class AuthService {
         email: email,
         password: bcrypt.hashSync(password, salt),
       },
+      omit: {
+        password: true,
+      },
     });
 
     return {
@@ -178,6 +181,9 @@ class AuthService {
       },
       data: {
         password: bcrypt.hashSync(newPassword, bcrypt.genSaltSync()),
+      },
+      omit: {
+        password: true,
       },
     });
 
