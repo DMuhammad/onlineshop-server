@@ -14,6 +14,11 @@ const authService = new AuthService();
 
 const signIn = catchAsync(async (req, res) => {
   const validated = validateSignIn(req.body);
+
+  if (validated.status) {
+    return errorResponse(res, "Validation failed", validated.error);
+  }
+
   const { error, result } = await authService.signIn(validated);
 
   if (error) {
@@ -30,6 +35,11 @@ const signIn = catchAsync(async (req, res) => {
 
 const signUp = catchAsync(async (req, res) => {
   const validated = validateSignUp(req.body);
+
+  if (validated.status) {
+    return errorResponse(res, "Validation failed", validated.error);
+  }
+
   const { error, result } = await authService.signUp(validated);
 
   if (error) {
@@ -55,6 +65,11 @@ const signOut = catchAsync(async (req, res) => {
 
 const changePassword = catchAsync(async (req, res) => {
   const validated = validateUpdatePassword(req.body);
+
+  if (validated.status) {
+    return errorResponse(res, "Validation failed", validated.error);
+  }
+
   const { error, result } = await authService.changePassword(
     validated,
     req.params
